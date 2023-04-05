@@ -26,6 +26,7 @@ data = {
 
 # Define a function to scrape data and send it to Slack
 def scrape_data_and_send_to_slack():
+    print("start scraping")
     # Send a POST request to the API endpoint with the data in the request body
     response = requests.post(url, json=data, headers={'api-key': api_key})
 
