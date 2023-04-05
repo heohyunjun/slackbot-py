@@ -38,7 +38,8 @@ def scrape_data_and_send_to_slack():
         app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, text=f"The scraped data is: {scraped_data}")
     else:
         # Print the error message if the request was not successful
-        print(f"Request failed with status code {response.status_code}: {response.text}")
+        app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, text=f"Request failed with status code {response.status_code}: {response.text}")
+
 
 # Schedule the function to run every 10 minutes
 schedule.every(10).minutes.do(scrape_data_and_send_to_slack)
