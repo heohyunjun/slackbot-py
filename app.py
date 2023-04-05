@@ -1,10 +1,13 @@
 import os
 import logging
 import requests
+import threading
 from slack_bolt import App
 from dotenv import load_dotenv
 import schedule
 import time
+from flask import Flask, request
+from slack_bolt.adapter.flask import SlackRequestHandler
 
 load_dotenv()
 logging.basicConfig(level=logging.DEBUG)
@@ -41,12 +44,8 @@ def scrape_data_and_send_to_slack():
         # Print the error message if the request was not successful
         app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, text=f"Request failed with status code {response.status_code}: {response.text}")
 
-
 # Schedule the function to run every 10 minutes
 schedule.every(10).minutes.do(scrape_data_and_send_to_slack)
-
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
@@ -55,10 +54,21 @@ handler = SlackRequestHandler(app)
 def slack_events():
     return handler.handle(request)
 
-if __name__ == "__main__":
+def run_flask_app():
     flask_app.run()
 
-    # Run the scheduled function loop
+def run_schedule_loop():
     while True:
         schedule.run_pending()
         time.sleep(1)
+
+if __name__ == "__main__":
+    # Create and start separate threads for the Flask app and the scheduled function loop
+    flask_app_thread = threading.Thread(target=run_flask_app)
+    schedule_loop_thread = threading.Thread(target=run_schedule_loop)
+
+    flask_app_thread.start()
+    schedule_loop_thread.start()
+
+    flask_app_thread.join()
+    schedule_loop_thread.join()
