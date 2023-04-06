@@ -16,7 +16,6 @@ SLACK_CHANNEL_ID = os.environ.get("SLACK_CHANNEL_ID")
 app = App(token=SLACK_BOT_TOKEN)
 
 # Define the API endpoint URL and request data
-# url = "https://scrapinvest-heohyunjun.koyeb.app/scrape"
 url = os.environ.get("API_URL")
 api_key = os.environ.get("API_KEY")
 
