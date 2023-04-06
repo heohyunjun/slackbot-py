@@ -1,16 +1,11 @@
 import os
-import logging
 import requests
-import threading
-from slack_bolt import App
-from dotenv import load_dotenv
 import schedule
 import time
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
+from dotenv import load_dotenv
+from slack_bolt import App
 
 load_dotenv()
-logging.basicConfig(level=logging.DEBUG)
 
 # Define the Slack bot token and channel ID
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
@@ -47,28 +42,7 @@ def scrape_data_and_send_to_slack():
 # Schedule the function to run every 10 minutes
 schedule.every(10).minutes.do(scrape_data_and_send_to_slack)
 
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
-
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
-
-def run_flask_app():
-    flask_app.run()
-
-def run_schedule_loop():
+if __name__ == "__main__":
     while True:
         schedule.run_pending()
         time.sleep(1)
-
-if __name__ == "__main__":
-    # Create and start separate threads for the Flask app and the scheduled function loop
-    flask_app_thread = threading.Thread(target=run_flask_app)
-    schedule_loop_thread = threading.Thread(target=run_schedule_loop)
-
-    flask_app_thread.start()
-    schedule_loop_thread.start()
-
-    flask_app_thread.join()
-    schedule_loop_thread.join()
