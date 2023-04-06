@@ -22,7 +22,7 @@ api_key = os.environ.get("API_KEY")
 
 data = {
     'url': 'https://www.investing.com/news/stock-market-news',
-    'selector': '#leftColumn > div.largeTitle'
+    'selector': os.environ.get("SELECTOR")
 }
 
 def get_current_time():
