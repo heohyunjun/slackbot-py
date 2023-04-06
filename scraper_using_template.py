@@ -88,10 +88,10 @@ def scrape_data_and_send_to_slack():
             })
 
         # Send a message to the Slack bot with the blocks
-        app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, blocks=blocks)
+        app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, text="Scraped data summary", blocks=blocks)
     else:
         app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, text=f"Request failed with status code {response.status_code}: {response.text}")
-        
+
 # Schedule the function to run every 10 minutes
 schedule.every(10).minutes.do(scrape_data_and_send_to_slack)
 
