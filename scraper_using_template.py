@@ -3,6 +3,7 @@ import requests
 import schedule
 import datetime
 import time
+
 from dotenv import load_dotenv
 from slack_bolt import App
 
@@ -12,12 +13,12 @@ load_dotenv()
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 SLACK_CHANNEL_ID = os.environ.get("SLACK_CHANNEL_ID")
 
-# Create an instance of the Slack app
-app = App(token=SLACK_BOT_TOKEN)
-
 # Define the API endpoint URL and request data
 url = os.environ.get("API_URL")
 api_key = os.environ.get("API_KEY")
+
+# Create an instance of the Slack app
+app = App(token=SLACK_BOT_TOKEN)
 
 data = {
     'url': 'https://www.investing.com/news/stock-market-news',
@@ -34,10 +35,9 @@ def scrape_data_and_send_to_slack():
 
     if response.status_code == 200:
         scraped_data = response.json()
-
-        # Create a list to store blocks
-        blocks = []
         current_time = get_current_time()
+        blocks = []
+        
         # Iterate through the scraped data and build blocks for each article
         for article in scraped_data:
             title = article['title']
@@ -67,9 +67,16 @@ def scrape_data_and_send_to_slack():
             })
 
         # Send a message to the Slack bot with the blocks
-        app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, text="Scraped data summary", blocks=blocks)
+        app.client.chat_postMessage(
+            channel=SLACK_CHANNEL_ID, 
+            text="Scraped data summary", 
+            blocks=blocks
+        )
     else:
-        app.client.chat_postMessage(channel=SLACK_CHANNEL_ID, text=f"Request failed with status code {response.status_code}: {response.text}")
+        app.client.chat_postMessage(
+            channel=SLACK_CHANNEL_ID, 
+            text=f"Request failed with status code {response.status_code}: {response.text}"
+        )
 
 # Schedule the function to run every 10 minutes
 schedule.every(10).minutes.do(scrape_data_and_send_to_slack)
